@@ -1,0 +1,27 @@
+---
+- hosts: all
+  gather_facts: no
+  remote_user: root
+  tasks:
+    - name: install nginx
+      yum:
+        name: nginx
+        state: present
+    - name: start and enable nginx
+      service:
+        name: nginx
+        state: started
+        enable: yes
+    - name: allow http port
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+        immediate: yes
+    - name: check status
+      uri:
+        url: http://192.168.52.140
+      register: result
+      delegate_to: localhost
+    - debug:
+        msg: "HTTP Status code :: {{ result.status }}"
